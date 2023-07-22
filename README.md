@@ -1,5 +1,7 @@
 # Google Maps in Flutter
+This project would be contain of to implement Google Map in Flutter. 
 
+## Project Permission Prepare
 1. Adding packages in pubspec.yaml
 ```yaml
   google_maps_flutter: ^2.2.1
@@ -13,7 +15,7 @@
 3. Adding this line under flutterEmbedding in file `android\app\src\main\AndroidManifest.xml`:
 ```xml
     <meta-data android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyBA_N4obTKm34xlQiOnb7tF14aE8ABcufU"/>
+        android:value="API_KEY"/>
 ```
 And permission:
 ```xml
@@ -22,7 +24,8 @@ And permission:
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 ```
 
-4. For get geo's API Key:
+## Getting API Key from Google Console
+1. For get geo's API Key:
 a. Open (Google Console)(https://console.cloud.google.com/welcome/new?project=dependable-star-393506)
 ![image](https://user-images.githubusercontent.com/54527045/255093730-981b5bff-455a-41a5-97e8-32315803960c.png)
 b. Scroll to Products and choose Access services.
@@ -34,8 +37,9 @@ d. After the page opened, click enable.
 ![image](https://user-images.githubusercontent.com/54527045/255095772-9d6ff9a1-d78a-4963-a36d-db34a5aeb329.png)
 e. Wait until the API-key pop up show up
 ![image](https://user-images.githubusercontent.com/54527045/255096244-45b827c8-0208-4aa8-9716-6ced366f59f8.png)
+f. Copy the API key and paste in AndroidManifest.xml.
 
-5. Give restricted option:
+2. Give restricted option:
 a. From Landing page, open your project by click your project name:
 (can choose by click 'You're working on project (Project name)' <!-- or choose the side of Google Cloud logo  -->)
 ![image](https://user-images.githubusercontent.com/54527045/255099715-529decbc-b756-4129-a0dc-e554c2ce0fd3.png)
@@ -48,6 +52,7 @@ d. click the 3 buttons's point and choose `Edit API key`
 e. in Option of _set an application restriction_ choose Android apps: and click ADD
 ![image](https://user-images.githubusercontent.com/54527045/255102865-6882669f-e7c0-44d2-ab46-4e4aa8f47b79.png)
 f. fill the form by:
+
 f.1 Packages name can be find in AndroidManifest.xml:
 ```xml
 <!-- Copy the value of packages -->
@@ -63,3 +68,4 @@ or this comment:
 keytool -list -v -keystore c:\Users\"user-name"\.android\debug.keystore -alias androiddebugkey -storepass android -keypass android
 ```
 After that, click save.
+
