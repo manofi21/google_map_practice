@@ -130,6 +130,7 @@ This following step would generate file type `.freezed.dart`. Or would be called
 
 ## :fried_egg: Handling the feature by using Repo, model, and Use Cases
 ![Clean-Architecture-Flutter-Diagram](https://user-images.githubusercontent.com/54527045/255397743-36ed7e89-36b6-4542-a129-6f14f56683c2.jpg)
+
 From this diagram, the folder's feature would be handle like Data, Domain and Presentation. 
 
 One of another feature that can be use as Example is Device location.
@@ -150,17 +151,19 @@ This short explanation of folder or what kind files that can be filled in the fo
 1. Data
 The folder consist for process data from API or Local. This folder responsible to handing activity get, put, post, or delete. 
 The folder usualy contain:
- __a. data_source__: containt class of accessing data (either from API or Local) and converting value to class in folder _Model_ 
- __b. model__: containt class that be used for convert cached data in __data_source__ folder
- __c. repos__: containt implemented class repos from folder repos in domain's folder. The repos would be a bridge of __data__ and __domain__. So the implementation of repos in folder __data__, and the abstract class of the __repos__ in __domain__.
+   __a. data_source__: containt class of accessing data (either from API or Local) and converting value to class in folder _Model_ 
+   __b. model__: containt class that be used for convert cached data in __data_source__ folder
+   __c. repos__: containt implemented class repos from folder repos in domain's folder. The repos would be a bridge of __data__ and __domain__. So the implementation of repos in folder __data__, and the abstract class of the __repos__ in __domain__.
 
 2. domain
 The folder consist for process data from __data_source__ to use cases. This folder focus to handling bbusiness logic like handling error, change model to entities, and so on.
 The folder usualy contain:
-__a. entites__
-__b. repos__
-__c. use_cases__
-
+  __a. entites__
+  containt class that be used for convert Model in repos folder
+  __b. repos__
+  containt abstract class for repos folder in folder data
+  __c. use_cases__
+  containt use cases that handle bussiness logic in that be used in presentation later
 #### :memo: Writing code base of folder's structure
 
 #### :syringe: Injecting every aspect (from Data Source until Use Cases)
