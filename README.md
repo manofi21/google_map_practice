@@ -1,7 +1,7 @@
 # Google Maps in Flutter
 This project would be contain of to implement Google Map in Flutter. 
 
-## :beginner: Project Permission Prepare
+## :beginner: Project Permission Preparation
 1. Adding packages in pubspec.yaml
 ```yaml
   google_maps_flutter: ^2.2.1
@@ -26,6 +26,7 @@ And permission:
 
 ## :key: Getting API Key from Google Console
 1. For get geo's API Key:
+
 a. Open (Google Console)(https://console.cloud.google.com/welcome/new?project=dependable-star-393506)
 ![image](https://user-images.githubusercontent.com/54527045/255093730-981b5bff-455a-41a5-97e8-32315803960c.png)
 
@@ -126,3 +127,40 @@ This following step would generate file type `.freezed.dart`. Or would be called
 
 4. in use_cases's folder would be contain this file:
 - future_result_use_case.dart: this file would contian abstract class that be used for implementing use cases from repository.
+
+## :fried_egg: Handling the feature by using Repo, model, and Use Cases
+![Clean-Architecture-Flutter-Diagram](https://user-images.githubusercontent.com/54527045/255397743-36ed7e89-36b6-4542-a129-6f14f56683c2.jpg)
+From this diagram, the folder's feature would be handle like Data, Domain and Presentation. 
+
+One of another feature that can be use as Example is Device location.
+The folder's structure would be like this:
+- device_location
+  - data
+    - data_source
+    - model
+    - repos
+  - domain
+    - repos
+    - use_cases
+    - entites (not in use because not find requiredment)
+  - presentation (keep for laters)
+
+#### :file_folder: Explanation of folder sturcture and impl according device location's case
+This short explanation of folder or what kind files that can be filled in the folders.
+1. Data
+The folder consist for process data from API or Local. This folder responsible to handing activity get, put, post, or delete. 
+The folder usualy contain:
+ __a. data_source__: containt class of accessing data (either from API or Local) and converting value to class in folder _Model_ 
+ __b. model__: containt class that be used for convert cached data in __data_source__ folder
+ __c. repos__: containt implemented class repos from folder repos in domain's folder. The repos would be a bridge of __data__ and __domain__. So the implementation of repos in folder __data__, and the abstract class of the __repos__ in __domain__.
+
+2. domain
+The folder consist for process data from __data_source__ to use cases. This folder focus to handling bbusiness logic like handling error, change model to entities, and so on.
+The folder usualy contain:
+__a. entites__
+__b. repos__
+__c. use_cases__
+
+#### :memo: Writing code base of folder's structure
+
+#### :syringe: Injecting every aspect (from Data Source until Use Cases)
