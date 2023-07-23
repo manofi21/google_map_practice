@@ -150,20 +150,28 @@ The folder's structure would be like this:
 This short explanation of folder or what kind files that can be filled in the folders.
 1. Data
 The folder consist for process data from API or Local. This folder responsible to handing activity get, put, post, or delete. 
+
 The folder usualy contain:
+
    __a. data_source__: containt class of accessing data (either from API or Local) and converting value to class in folder _Model_ 
+
    __b. model__: containt class that be used for convert cached data in __data_source__ folder
+
    __c. repos__: containt implemented class repos from folder repos in domain's folder. The repos would be a bridge of __data__ and __domain__. So the implementation of repos in folder __data__, and the abstract class of the __repos__ in __domain__.
 
 2. domain
 The folder consist for process data from __data_source__ to use cases. This folder focus to handling bbusiness logic like handling error, change model to entities, and so on.
+
 The folder usualy contain:
-  __a. entites__
-  containt class that be used for convert Model in repos folder
-  __b. repos__
-  containt abstract class for repos folder in folder data
-  __c. use_cases__
-  containt use cases that handle bussiness logic in that be used in presentation later
+
+  __a. entites__: containt class that be used for convert Model in repos folder
+
+  __b. repos__: containt abstract class for repos folder in folder data
+
+  __c. use_cases__: containt use cases that handle bussiness logic in that be used in presentation later
+
 #### :memo: Writing code base of folder's structure
+The step of writing the code start from:
+creating __model__ -> handle proceesing data in __data_source__ -> bridging result by __repos__ -> impl bussiness logic in use cases -> serve data to Presentation  
 
 #### :syringe: Injecting every aspect (from Data Source until Use Cases)
