@@ -16,7 +16,7 @@ class DeviceLocationDataSourceImpl implements DeviceLocationDataSource {
     try {
       final isEnable = await location.serviceEnabled();
       if (!isEnable) {
-        // Just throw String so that the catch would throw to [DeviceLocationRepoException]
+        // Just throw String so that the catch would throw as [DeviceLocationRepoException]
         throw 'Look like the GPS off. Make sure the GPS is Online';
       }
 

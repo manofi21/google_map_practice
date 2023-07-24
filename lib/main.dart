@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_map_practice/page/home_page.dart';
 
+import 'locator.dart';
+
 void main() {
+  setup();
   runApp(const MyApp());
 }
 

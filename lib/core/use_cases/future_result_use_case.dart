@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import '../errors/failure.dart';
 import '../result_handler/result.dart';
 
@@ -12,6 +14,9 @@ abstract class FutureResultUseCase<ReturnType, ParameterType> {
         },
       );
     } catch (e) {
+      if (e is PlatformException) {
+        return Err(UnknownFailure(e.message ?? e.details));
+      }
       return Err(UnknownFailure(e.toString()));
     }
   }

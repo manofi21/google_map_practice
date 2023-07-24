@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_map_practice/core/result_handler/no_params.dart';
+import 'package:google_map_practice/locator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+
+import '../device_location/domain/use_cases/get_current_location.dart';
 
 class HomaPage extends StatefulWidget {
   const HomaPage({super.key});
@@ -23,10 +27,19 @@ class _HomaPageState extends State<HomaPage> {
   }
 
   _init() async {
+    final getCurrentLocCase = getIt<GetCurrentLocation>();
+    final value = await getCurrentLocCase(NoParams());
+    value.when(ok: (ok) {
+      print('Value : ${ok.toJson()}');
+    }, err: (err) {
+      print('Value Err : ${err.message}');
+    });
+
+
     _location = Location();
     _initLocation();
     final targetLat = _currentLocation?.latitude ?? 0;
-    final targetLong = _currentLocation?.latitude ?? 0;
+    final targetLong = _currentLocation?.longitude ?? 0;
     _cameraPosition = CameraPosition(target: LatLng(targetLat, targetLong), zoom: 25);
   }
 
@@ -87,16 +100,16 @@ class _HomaPageState extends State<HomaPage> {
   Widget _getMap() {
     return Stack(
       children: [
-        GoogleMap(
-          initialCameraPosition: _cameraPosition!,
-          mapType: MapType.normal,
-          onMapCreated: (GoogleMapController controller) {
-            // now we need a variable to get the controller of google map
-            if (!_googleMapController.isCompleted) {
-              _googleMapController.complete(controller);
-            }
-          },
-        ),
+        // GoogleMap(
+        //   initialCameraPosition: _cameraPosition!,
+        //   mapType: MapType.normal,
+        //   onMapCreated: (GoogleMapController controller) {
+        //     // now we need a variable to get the controller of google map
+        //     if (!_googleMapController.isCompleted) {
+        //       _googleMapController.complete(controller);
+        //     }
+        //   },
+        // ),
         Positioned.fill(
             child: Align(alignment: Alignment.center, child: _getMarker()))
       ],

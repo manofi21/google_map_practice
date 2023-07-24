@@ -131,6 +131,8 @@ This following step would generate file type `.freezed.dart`. Or would be called
 ## :fried_egg: Handling the feature by using Repo, model, and Use Cases
 ![Clean-Architecture-Flutter-Diagram](https://user-images.githubusercontent.com/54527045/255397743-36ed7e89-36b6-4542-a129-6f14f56683c2.jpg)
 
+(img sorce: Reso coder)
+
 From this diagram, the folder's feature would be handle like Data, Domain and Presentation. 
 
 One of another feature that can be use as Example is Device location.
@@ -172,6 +174,167 @@ The folder usualy contain:
 
 #### :memo: Writing code base of folder's structure
 The step of writing the code start from:
-creating __model__ -> handle proceesing data in __data_source__ -> bridging result by __repos__ -> impl bussiness logic in use cases -> serve data to Presentation  
+creating __model__ -> handle proccesing data in __data_source__ -> bridging result by __repos__ -> impl bussiness logic in __use_cases__ -> serve data to Presentation  
+
+1. creating __model__
+After determine value from data source, set in one model. For developer's convenience, usually the models containt the following functions:
+- `toJson`(not used in this case): for convert model back to data source. Usualy for create/update
+- `fromJson`(not used in this case): for convert data source to model. Usualy for fetch data
+file location: `lib\device_location\data\model\lat_lng_model.dart`
+```dart
+class LatLngModel {
+  final double latitude;
+  final double longitude;
+  
+  const LatLngModel({
+    required this.latitude,
+    required this.longitude,
+  });
+}
+```
+
+2. handle proccesing data in __data_source__
+When the model complete, create function using the model for proccessing data. For ex:
+If the function of proccesing data for fetching, return the function to the Model.
+`Future<LatLngModel> getCurrentLatLngLocation();`
+For in case, make sure for use __*try-catch*__. The would help some Unexpected error in future like error from updating type in data source, the changes of data accessing permission's process, and so on.
+
+file location: `lib\device_location\data\data_source\device_location_data_source.dart`
+```dart
+Future<LatLngModel> getCurrentLatLngLocation() async {
+  try {
+    final isEnable = await location.serviceEnabled();
+    if (!isEnable) {
+      // Just throw String so that 
+      // the catch would throw as [DeviceLocationRepoException]
+      throw 'Look like the GPS off. Make sure the GPS is Online';
+    }
+
+    final getCurrentLoc = await location.getLocation();
+    final targetLat = getCurrentLoc.latitude ?? 0;
+    final targetLong = getCurrentLoc.longitude ?? 0;
+    return LatLngModel(latitude: targetLat, longitude: targetLong);
+  } catch (e) {
+    if (e is PlatformException) {
+      throw DeviceLocationRepoException(e.message ?? e.details);
+    }
+    throw DeviceLocationRepoException(e.toString());
+  }
+}
+```
+
+3. bridging result by __repos__
+Because the repos is bridging for data to domain, make sure the repos in two folder where abstract class in domain, and the impl in data. 
+
+In inside repos impl, usualy for change model to entites. So that the data would be serve to presentation from use cases.
+
+abstract location:`lib\device_location\domain\repos\device_location_repo.dart`
+```dart
+abstract class DeviceLocationRepo {
+  Future<LatLng> currentLatLngLocation();
+}
+```
+
+impl location:`lib\device_location\data\repos\device_location_repo.dart`
+```dart
+Future<LatLng> currentLatLngLocation() async {
+  ....
+}
+```
+
+make sure for using __*try-catch*__ like in source data but the thow would return Faiure rather than exception. The source data already throw Exception and just return `instead of 'Exception'` if just throw along inside __*catch*__. So, for handle the Execption must catch the previouse Exception from source data using _on_ keyword in between _try_ and _catch_.
+```dart
+Future<LatLng> currentLatLngLocation() async {
+  try {
+    final currentLocation =
+        await deviceLocationDataSource.getCurrentLatLngLocation();
+    final latitude = currentLocation.latitude;
+    final longitude = currentLocation.longitude;
+    return LatLng(latitude, longitude); 
+  } on DeviceLocationRepoException catch (e) {
+    throw UnknownFailure('Cause in [DeviceLocationDataSourceImpl] : ${e.message}');
+  } catch (e) {
+    throw DeviceLocationRepoFailure('Cause in [DeviceLocationRepoImpl] : ${e.toString()}');
+  }
+}
+```
+
+4. impl bussiness logic in __use_cases__
+By using `FutureResultUseCase` for create use cases class, the result that would be serve to UI only entities, and Failure. Some validation like wrong validation, or empty parameter from user can be set in here. The use case can receive parameter or no params at all.
+```dart
+Future<Result<LatLng, Failure>> processCall(NoParams params) async {
+  try {
+    final location = await deviceLocationRepo.currentLatLngLocation();
+    return Ok(location);
+  } on UnknownFailure catch (failure) {
+    return Err(failure);
+  } on DeviceLocationRepoFailure catch (failure) {
+    return Err(failure);
+  } catch (err) {
+    return Err(UnknownFailure('Cause in [GetCurrentLocation] : ${err.toString()}'));
+  }
+}
+```
+
+5. Serving TIME!
+then call the use cases allowing in controller, state management, or UI instead(but prefer inside state management for best practice).
+
+```dart
+  final getCases = GetCurrentLocation(DeviceLocationRepoImpl(
+    DeviceLocationDataSourceImpl(
+      Location(),
+    ),
+  ));
+
+  final value = await getCases(NoParams());
+  value.when(ok: (ok) {
+    /// For serving data
+  }, err: (err) {
+    /// For show error
+  });
+```
+But rather than call the use cases by unite all component in parameter in one file, using dependency injection would make easier 
 
 #### :syringe: Injecting every aspect (from Data Source until Use Cases)
+1. Adding `get_it` packages in `pubspect.yaml`.
+
+2. create locator.dart files and registering the compnent like:
+- Locator
+- DeviceLocationDataSource
+- DeviceLocationRepo
+- GetCurrentLocation
+
+```dart
+final getIt = GetIt.instance;
+void setup() {
+  getIt.registerLazySingleton(() => Location());
+
+  getIt.registerSingleton<DeviceLocationDataSource>(
+      DeviceLocationDataSourceImpl(getIt<Location>()));
+
+  getIt.registerSingleton<DeviceLocationRepo>(
+      DeviceLocationRepoImpl(getIt<DeviceLocationDataSource>()));
+
+  getIt.registerFactory<GetCurrentLocation>(
+      () => GetCurrentLocation(getIt<DeviceLocationRepo>()));
+}
+```
+
+3. set the `setup` function in main.dart so that the registering could come first before run the UI.
+```dart
+void main() {
+  setup();
+  runApp(const MyApp());
+}
+```
+
+now for call the use cases of `GetCurrentLocation` just like this:
+```dart
+final getCurrentLocCase = getIt<GetCurrentLocation>();
+final value = await getCurrentLocCase(NoParams());
+value.when(ok: (ok) {
+  /// For serving data
+}, err: (err) {
+  /// For show error
+});
+```
